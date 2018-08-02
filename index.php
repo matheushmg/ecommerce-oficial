@@ -8,10 +8,11 @@ $app->config('debug', true);
 
 $app->get('/', function() {
     
-	echo "OK";
+	echo "Teste";
 
 });
 
 $app->run();
 
  ?>
+
