@@ -4,6 +4,7 @@ require_once("vendor/autoload.php");
 
 use \Slim\Slim;
 use \Matheushmg\Page;
+use \Matheushmg\PageAdmin;
 
 $app = new Slim();
 
@@ -19,6 +20,14 @@ $app->get('/', function() { // São as Rotas; Função onde os arquivos poderão
 	*/ // Testando o Banco de dados..
 
 	$page = new Page();
+
+	$page->setTpl("index");
+
+});
+
+$app->get('/admin', function() { 
+
+	$page = new PageAdmin();
 
 	$page->setTpl("index");
 

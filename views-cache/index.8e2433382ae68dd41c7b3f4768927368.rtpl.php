@@ -12,7 +12,7 @@
 							<a class="caption button-radius" href="#"><span class="icon"></span>Comprar</a>
 						</div>
 					</li>
-					<li><img src="img/h4-slide2.png" alt="Slide">
+					<li><img src="/res/site/img/h4-slide2.png" alt="Slide">
 						<div class="caption-group">
 							<h2 class="caption title">
 								by one, get one <span class="primary">50% <strong>off</strong></span>
