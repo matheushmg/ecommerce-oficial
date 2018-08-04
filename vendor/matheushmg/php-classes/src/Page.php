@@ -9,6 +9,8 @@ class Page {
 	private $tpl;
 	private $options = [];
 	private $defaults = [
+		"header"=>true,
+		"footer"=>true,
 		"data"=>[]
 	];
 	
@@ -28,7 +30,7 @@ class Page {
 
 		$this->setData($this->options["data"]);
 
-		$this->tpl->draw("header"); // Desenhar/colocar o layout na tela.. O DRAY ele espera o nome do Arquivo que quer Chamar
+		if($this->options["header"] === true) $this->tpl->draw("header"); // Desenhar/colocar o layout na tela.. O DRAY ele espera o nome do Arquivo que quer Chamar
 	}
 	private function setData($data = array()){
 
@@ -48,7 +50,7 @@ class Page {
 
 	public function __destruct(){// Metodos Magicos
 
-		$this->tpl->draw("footer");
+		if($this->options["footer"] === true) $this->tpl->draw("footer");
 		
 	}
 	
