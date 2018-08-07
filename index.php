@@ -184,14 +184,14 @@ $app->post("/admin/forgot", function (){
 
 });
 
-$app->get("/admin/forgot/send", function () {
+$app->get("/admin/forgot/sent", function () {
 
 	$page = new PageAdmin([
 		"header" => false,
 		"footer" => false
 	]);
 
-	$page->setTpl("forgot-send");
+	$page->setTpl("forgot-sent");
 	
 });
 

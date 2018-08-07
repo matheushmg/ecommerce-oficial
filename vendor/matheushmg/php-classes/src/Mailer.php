@@ -45,6 +45,16 @@ class Mailer  {
 
 		$this->mail->SMTPAuth = true;
 
+		$this->mail->smtpConnect = array(
+	        'ssl' => array(
+	        'verify_peer' => false,
+	        'verify_peer_name' => false,
+	        'allow_self_signed' => true
+	    ));
+
+	    $this->mail->SMTPSecure = false;
+	    $this->mail->SMTPAutoTLS = false;
+
 		$this->mail->Username = Mailer::USERNAME;
 
 		$this->mail->Password = Mailer::PASSWORD;
@@ -64,7 +74,6 @@ class Mailer  {
 		} else {
 		    echo "Message sent!";
 		}*/
-
 
 		// Talvez Terá que trocar a Variavel dessa função em especifica..
 		function save_mail($mail) {
