@@ -4,10 +4,14 @@ namespace Matheushmg\Model;
 
 use \Matheushmg\DB\Sql;
 use \Matheushmg\Model;
+use \Matheushmg\Mailer;
+use Rain\Tpl\Exception;
+
 
 class User extends Model{
 
 	const SESSION = "User";
+	const SECRET = "SequenciaDeCaracteres";
 
 	public static function login($login, $password)
 	{
@@ -39,6 +43,7 @@ class User extends Model{
 
 		} else {
 			throw new \Exception("Usuario Inexistente ou Senha Inválida!!");
+			//echo $login;
 		}
 
 	}
@@ -78,7 +83,7 @@ class User extends Model{
 	
 		$sql = new Sql();
 
-		$results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) ORDER BY a.iduser = :iduser", array(":iduser"=>$iduser));
+		$results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) WHERE a.iduser = :iduser", array(":iduser"=>$iduser));
 
 		$data = $results[0];
 
@@ -130,6 +135,60 @@ class User extends Model{
 		));
 	}
 
-}
+	public static function getForgot($email, $inadmin = true){
+
+	        $sql = new Sql();
+
+	        $res = $sql->select("
+	            
+	            SELECT * 
+	            FROM tb_persons a 
+	            INNER JOIN tb_users b 
+	            USING (idperson) 
+	            WHERE a.desemail = :email;",
+	            array(":email" => $email)
+	        );
+
+	        if (count($res) === 0) {
+	            throw new \Exception("Não foi possível recuperar a senha.");
+	        } else {
+
+	            $data = $res[0];
+
+	            $results = $sql->select("CALL sp_userspasswordsrecoveries_create(:iduser, :desip)", array(
+	                ":iduser" => $data["iduser"],
+	                ":desip" => $_SERVER["REMOTE_ADDR"]
+	            ));
+
+	            if (count($results) === 0) {
+	                throw new \Exception("Não foi possível recuperar a senha.");
+	            } else {
+
+	                $dataRecovery   = $results[0];
+	                $iv             = random_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+	                $code           = openssl_encrypt($dataRecovery['idrecovery'], 'aes-256-cbc', User::SECRET, 0, $iv);
+	                $result         = base64_encode($iv . $code);
+	                if ($inadmin === true) {
+	                    $link = "http://www.lojavirtual.com/admin/forgot/reset?code=$result";
+	                } else {
+	                    $link = "http://www.lojavirtual.com/forgot/reset?code=$result";
+	                }
+
+	                $mailer = new Mailer($data["desemail"], $data["desperson"], "Redefinir senha", "forgot",
+	                    array(
+	                        "name" => $data["desperson"],
+	                        "link" => $link
+	                    )
+	                );
+
+	                $mailer->send();
+
+	                return $link;
+	            }
+	        }
+	    }
+
+	}
+
 
 ?>
