@@ -8,143 +8,132 @@ use \Matheushmg\Mailer;
 
 class User extends Model{
 
-      const SESSION = "User";
-      const SECRET = "FontePhp7_Secret";
-      
-      public static function getFromSession() {
-            $user = new User();
+	const SESSION = "User";
+	const SECRET = "FontePhp7_Secret";
 
-            if(isset($_SESSION[User::SESSION]) && (int)$_SESSION[User::SESSION]['iduser'] > 0){
+	public static function login($login, $password)
+	{
 
-                  $user->setData($_SESSION[User::SESSION]);
+		$sql = new Sql();
 
-            }
+		$results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :LOGIN", array(
+			":LOGIN"=>$login
+		));
 
-            return $user;
+		if(count($results) === 0){
+			throw new \Exception("Usuario Inexistente ou Senha Invalida.");
+		}
 
-      }
+		$data = $results[0];
 
-      public static function checkLogin($inadmin = true){
+		if (password_verify($password, $data["despassword"]) === true){
 
-            if (!isset($_SESSION[User::SESSION])
-            || !$_SESSION[User::SESSION]
-            || !(int)$_SESSION[User::SESSION]["iduser"] > 0){
-                  return false;
-            } else {
+			$user = new User();
 
-                  if ($inadmin === true && (bool)$_SESSION[User::SESSION]['inadmin'] === true){
+			$user->setData($data);
 
-                        return true;
-                  
-                  } else if ($inadmin === false){
+			$_SESSION[User::SESSION]  = $user->getValues();
 
-                        return true;
+			return $user;
 
-                  } else {
+			/*var_dump($user); // Quando for retornar um array user var_dump
+			exit;*/
 
-                        return false;
-                        
-                  }
+		} else {
+			throw new \Exception("Usuario Inexistente ou Senha Inválida!!");
+			//echo $login;
+		}
 
-            }
+	}
 
-      }
-//---- 1
-      public static function login($login,$password) {
+	public static function verifyLogin( $inadmin = true){
 
-            $sql = new Sql();
-            
-            $results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :LOGIN",array(
-                  ":LOGIN"=>$login
-            ));
+		if(
+			!isset($_SESSION[User::SESSION])
+			|| 
+			!$_SESSION[User::SESSION]
+			||
+			!(int)$_SESSION[User::SESSION]["iduser"] > 0
+			||
+			(bool)$_SESSION[User::SESSION]["inadmin"] !== $inadmin
+		) {
+			header("Location: /admin/login");
+			exit;
+		}	
 
-            if(count($results) === 0) {
-                  throw new \Exception("Usuário inexistente ou senha inválida.");
-            }
+	}
 
-            $data = $results[0];
+	public static function logout(){
 
-            if(password_verify($password, $data["despassword"]) === true) {
-                  $user = new User();
+		$_SESSION[User::SESSION] = NULL;
 
-                  $user->setData($data);
+	}
 
-                  $_SESSION[User::SESSION] = $user->getValues(); 
+	public static function listAll(){
 
-                  return $user; // add       
+		$sql = new Sql();
 
-            } else {
-                  throw new \Exception("Usuário inexistente ou senha inválida.");
-            }
-      }
+		return $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) ORDER BY b.desperson");
 
-      public static function verifyLogin($inadmin = true) {
+	}
 
-            if(User::checkLogin($inadmin) 
-            || (bool)$_SESSION[User::SESSION]["inadmin"] !== $inadmin){
-                  header("Location: /admin/login");
-                  exit;
-            }
-      }
+	public function get($iduser){ // Parte Para o funcionamento da Etapa de Edita Usuarios
+	
+		$sql = new Sql();
 
-      public static function logout() {
-            $_SESSION[User::SESSION] = NULL;
-      }
+		$results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) WHERE a.iduser = :iduser", array(":iduser"=>$iduser));
 
-      public static function listAll(){
-            $sql = new Sql();
+		$data = $results[0];
 
-            return $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) ORDER BY b.desperson");
-      }
+		$this->setData($data);
 
-      public function save(){
-            $sql = new Sql();
-            $results = $sql->select("CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
-                  ":desperson"=>$this->getdesperson(),
-                  ":deslogin"=>$this->getdeslogin(),
-                  ":despassword"=>$this->getdespassword(),
-                  ":desemail"=>$this->getdesemail(),
-                  ":nrphone"=>$this->getnrphone(),
-                  ":inadmin"=>$this->getinadmin()
-            ));
-            $this->setData($results[0]);
-      } 
+	}
 
-      public function get($iduser){
-            
-            $sql = new Sql();
+	public function save() { // Salva as criações de Usuarios par o banco de dados
+		
+		$sql = new Sql();
 
-            $results = $sql->select("SELECT *    FROM tb_users a INNER JOIN tb_persons b USING(idperson) WHERE a.iduser = :iduser",array(
-                  ":iduser"=>$iduser
-            ));
-            $this->setData($results[0]);
-      }
-      
-      public function update(){
-            $sql = new Sql();
+		$results = $sql->select("CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
+			":desperson"=>$this->getdesperson(),
+			":deslogin"=>$this->getdeslogin(),
+			":despassword"=>$this->getdespassword(),
+			":desemail"=>$this->getdesemail(),
+			":nrphone"=>$this->getnrphone(),
+			":inadmin"=>$this->getinadmin()
+		));
 
-            $results = $sql->select("CALL sp_usersupdate_save(:iduser, :desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
-                  ":iduser"=>$this->getiduser(),
-                  ":desperson"=>$this->getdesperson(),
-                  ":deslogin"=>$this->getdeslogin(),
-                  ":despassword"=>$this->getdespassword(),
-                  ":desemail"=>$this->getdesemail(),
-                  ":nrphone"=>$this->getnrphone(),
-                  ":inadmin"=>$this->getinadmin()
-            ));
-            $this->setData($results[0]);
-      }
+		$this->setData($results[0]);
+	
+	}
 
-      public function delete() {
-            $sql = new Sql();
+	public function update() {
 
-            $sql->query("CALL sp_users_delete(:iduser)",array(
-                  "iduser"=>$this->getiduser()
-            ));
+		$sql = new Sql();
 
-      }
+		$results = $sql->select("CALL sp_usersupdate_save(:iduser, :desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
+			":iduser"=>$this->getiduser(),
+			":desperson"=>$this->getdesperson(),
+			":deslogin"=>$this->getdeslogin(),
+			":despassword"=>$this->getdespassword(),
+			":desemail"=>$this->getdesemail(),
+			":nrphone"=>$this->getnrphone(),
+			":inadmin"=>$this->getinadmin()
+		));
 
-      public static function getForgot($email, $inadmin = true) {
+		$this->setData($results[0]);
+	
+	}
+
+	public function delete() {
+		
+		$sql = new Sql();
+
+		$sql->query("CALL sp_users_delete(:iduser)", array(
+			":iduser"=>$this->getiduser()
+		));
+	}
+
+	public static function getForgot($email, $inadmin = true) {
             $sql = new Sql();
 
             $results = $sql->select("SELECT * FROM tb_persons a INNER JOIN tb_users b USING(idperson) WHERE a.desemail = :email",array(
@@ -245,6 +234,7 @@ class User extends Model{
                   ":iduser"=>$this->getiduser()
             ));
       }
+
 }
 
 

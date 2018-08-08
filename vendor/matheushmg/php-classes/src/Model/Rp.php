@@ -1,10 +1,11 @@
 <?php 
 
-namespace Hcode\Model;
+namespace Matheushmg\Model;
 
 use \Matheushmg\DB\Sql;
 use \Matheushmg\Model;
 use \Matheushmg\Mailer;
+use \Matheushmg\Model\User;
 
 class Rp extends Model{
 

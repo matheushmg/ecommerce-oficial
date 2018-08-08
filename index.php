@@ -8,7 +8,7 @@ use \Slim\Slim;
 use \Matheushmg\Page;
 use \Matheushmg\PageAdmin;
 use \Matheushmg\Model\User;
-
+//use \Matheushmg\Model\Rp;
 
 $app = new Slim();
 
