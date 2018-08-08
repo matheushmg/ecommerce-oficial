@@ -45,16 +45,13 @@ class Mailer  {
 
 		$this->mail->SMTPAuth = true;
 
-		$this->mail->smtpConnect = array(
-	        'ssl' => array(
+		$this->mail->SMTPOptions = array( // Parte em que faz a verificação de envio de e-mail.
+	    'ssl' => array(
 	        'verify_peer' => false,
 	        'verify_peer_name' => false,
 	        'allow_self_signed' => true
-	    ));
-
-	    $this->mail->SMTPSecure = false;
-	    $this->mail->SMTPAutoTLS = false;
-
+		));
+		
 		$this->mail->Username = Mailer::USERNAME;
 
 		$this->mail->Password = Mailer::PASSWORD;
@@ -65,7 +62,7 @@ class Mailer  {
 
 		$this->mail->Subject = $subject;
 
-		$this->mail->msgHTML($html);
+		$this->mail->msgHTML(utf8_decode($html));
 
 		$this->mail->AltBody = 'This is a plain-text message body';
 
