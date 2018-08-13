@@ -2,6 +2,7 @@
 
 use \Matheushmg\Page;
 use \Matheushmg\Model\Product;
+use \Matheushmg\Model\Category;
 
 $app->get('/', function() { // São as Rotas; Função onde os arquivos poderão ser encontrados.
     /*
@@ -18,6 +19,22 @@ $app->get('/', function() { // São as Rotas; Função onde os arquivos poderão
 
 	$page->setTpl("index", [
 		"products"=>Product::checkList($products)
+	]);
+
+});
+
+
+$app->get("/categories/:idcategory", function($idcategory){
+
+	$category = new Category();
+
+	$category->get((int)$idcategory);
+
+	$page = new Page();
+
+	$page->setTpl("category", [
+		"category"=>$category->getValues(),
+		"products"=>Product::checkList($category->getProducts())
 	]);
 
 });
