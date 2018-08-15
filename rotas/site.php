@@ -3,6 +3,7 @@
 use \Matheushmg\Page;
 use \Matheushmg\Model\Product;
 use \Matheushmg\Model\Category;
+use \Matheushmg\Model\Cart;
 
 $app->get('/', function() { // São as Rotas; Função onde os arquivos poderão ser encontrados.
     /*
@@ -65,6 +66,17 @@ $app->get("/products/:desurl", function($desurl){
 		"product"=>$product->getValues(),
 		"categories"=>$product->getCategories()
 	]);
+
+});
+
+
+$app->get("/cart", function(){
+
+	$cart = Cart::getFromSession();
+
+	$page = new Page();
+
+	$page->setTpl("cart");
 
 });
 
