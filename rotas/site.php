@@ -4,6 +4,8 @@ use \Matheushmg\Page;
 use \Matheushmg\Model\Product;
 use \Matheushmg\Model\Category;
 use \Matheushmg\Model\Cart;
+use \Matheushmg\Model\Address;
+use \Matheushmg\Model\User;
 
 $app->get('/', function() { // São as Rotas; Função onde os arquivos poderão ser encontrados.
     /*
@@ -145,5 +147,52 @@ $app->post("/cart/freight", function(){
 	exit;
 
 });
+
+$app->get("/checkout", function(){
+
+	User::verifyLogin(false);
+
+	$cart = Cart::getFromSession();
+
+	$address = new Address();
+
+	$page = new Page();
+
+	$page->setTpl("checkout", [
+		'cart'=>$cart->getValues(),
+		'address'=>$address->getValues()
+	]);
+
+});
+
+$app->get("/login", function(){
+
+	$page = new Page();
+
+	$page->setTpl("login", [
+		'error'=>User::getError()
+	]);
+
+});
+
+$app->post("/login", function(){
+
+	//try {
+
+		User::login($_POST['login'], $_POST['password']);
+		
+	/*} catch (Exception $e) {
+
+		User::setError($e->getMessage());
+		
+	}*/
+
+	echo json_encode(User::login($_POST['login'], $_POST['password']));
+
+	header("Location : /checkout");
+	exit;
+
+});
+
 
 ?>

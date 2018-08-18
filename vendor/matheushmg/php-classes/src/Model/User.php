@@ -11,6 +11,9 @@ class User extends Model{
 	const SESSION = "User";
 	const SECRET = "FontePhp7_Secret";
 
+	const ERROR = "UserError";
+	const ERROR_REGISTER = "UserErrorRegister";
+
 	public static function getFromSession()	{
 		
 		$user = new User();
@@ -78,6 +81,9 @@ class User extends Model{
 
 			$_SESSION[User::SESSION]  = $user->getValues();
 
+			/*var_dump($_SESSION[User::SESSION]);
+			exit;*/
+
 			return $user;
 
 			/*var_dump($user); // Quando for retornar um array user var_dump
@@ -92,10 +98,20 @@ class User extends Model{
 
 	public static function verifyLogin( $inadmin = true){
 
-		if(User::checkLogin($inadmin)) {
+		/*if(User::checkLogin($inadmin)) {
 			header("Location: /admin/login");
 			exit;
-		}	
+		}*/
+
+		if(User::checkLogin($inadmin)) {
+
+			if ($inadmin){
+				header("Location: /admin/login");
+			} else {
+				header("Location: /login");
+			}
+			exit;
+		}
 
 	}
 
@@ -270,6 +286,35 @@ class User extends Model{
                   ":iduser"=>$this->getiduser()
             ));
       }
+
+    public static function setError($msg){
+    	
+    	$_SESSION[User::ERROR] = $msg;
+    
+    }
+
+    public static function getError(){
+
+    	$msg = (isset($_SESSION[User::ERROR]) && $_SESSION[User::ERROR]) ? $_SESSION[User::ERROR] : '';
+
+    	User::clearError();
+
+    	return $msg;
+
+    }
+
+    public static function clearError(){
+
+    	$_SESSION[User::ERROR] = NULL;
+
+    }
+
+    public static function setErrorRegister($msg){
+
+    	$_SESSION[User::ERROR_REGISTER] = $msg;
+
+    }
+
 
 }
 
