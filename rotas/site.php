@@ -177,17 +177,15 @@ $app->get("/login", function(){
 
 $app->post("/login", function(){
 
-	//try {
+	try {
 
 		User::login($_POST['login'], $_POST['password']);
 		
-	/*} catch (Exception $e) {
+	} catch (Exception $e) {
 
 		User::setError($e->getMessage());
 		
-	}*/
-
-	echo json_encode(User::login($_POST['login'], $_POST['password']));
+	}
 
 	header("Location : /checkout");
 	exit;
