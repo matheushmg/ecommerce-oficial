@@ -313,33 +313,40 @@ class User extends Model{
 
     }
 
-    public static function setErrorRegister($msg){
+	public static function setErrorRegister($msg){
 
     	$_SESSION[User::ERROR_REGISTER] = $msg;
 
     }
 
-    public static function setMsgError($msg){
+    public static function getErrorRegister(){
 
-		$_SESSION[Cart::SESSION_ERROR] = $msg;
+    	$msg = (isset($_SESSION[User::ERROR_REGISTER]) && $_SESSION[User::ERROR_REGISTER]) ? $_SESSION[User::ERROR_REGISTER] : '';
+
+    	User::clearErrorRegister();
+
+    	return $msg;
+
+    }
+
+    public static function clearErrorRegister(){
+
+    	$_SESSION[User::ERROR_REGISTER] = NULL;
+
+	}
+
+	public static function checkLoginExist($login) {
+		
+		$sql = new Sql();
+
+		$results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :deslogin", [
+			':deslogin'=>$login
+		]);
+
+		return (count($results) > 0);
 
 	}
 
-	public static function getMsgError(){
-
-		$msg = (isset($_SESSION[Cart::SESSION_ERROR])) ? $_SESSION[Cart::SESSION_ERROR] : "";
-
-		Cart::clearMsgError();
-
-		return $msg;
-
-	}
-
-	public static function clearMsgError(){
-
-		$_SESSION[Cart::SESSION_ERROR] = NULL;
-
-	}
 
 	public static function getPasswordHash($password) {
 
@@ -348,7 +355,6 @@ class User extends Model{
 		]);
 		
 	}
-
 
 }
 
