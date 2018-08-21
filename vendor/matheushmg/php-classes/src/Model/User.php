@@ -222,7 +222,7 @@ class User extends Model{
                         if ($inadmin === true) {
                               $link = "http://www.lojavirtual.com/admin/forgot/reset?code=$result";
                         } else {
-                              $link = "http://www.lojavirtual.com/forgot/reset?code=$resultt";
+                              $link = "http://www.lojavirtual.com/forgot/reset?code=$result";
                         } 
 
                         $mailer = new Mailer($data['desemail'], $data['desperson'], "Redefinir senha da Hcode Store", "forgot", array(
