@@ -1,6 +1,7 @@
 <?php 
 
 use \Matheushmg\Model\User;
+use \Matheushmg\Model\Cart;
 
 function formatPrice($vlprice) {
 
@@ -21,6 +22,26 @@ function getUserName() {
 	$user = User::getFromSession();
 
 	return $user->getdesperson();
+
+}
+
+function getCartNrQtd(){
+
+	$cart = Cart::getFromSession();
+
+	$totals = $cart->getProductsTotals();
+
+	return $totals['nrqtd'];
+
+}
+
+function getCartVlSubTotal(){
+
+	$cart = Cart::getFromSession();
+
+	$totals = $cart->getProductsTotals();
+
+	return formatPrice($totals['vlprice']);
 
 }
 
