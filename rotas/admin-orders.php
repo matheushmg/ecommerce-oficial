@@ -46,7 +46,7 @@ $app->post("/admin/orders/:idorder/status", function($idorder){
 	$order->save();
 
 	Order::setSuccess("STATUS Atualizado..");
-	
+
 	header("Location: /admin/orders/".$idorder."/status");
 	exit;
 
@@ -80,9 +80,9 @@ $app->get("/admin/orders/:idorder", function($idorder){
 	$page = new PageAdmin();
 
 	$page->setTpl("order", [
-		"order"=>$order->getValues(),
-		"cart"=>$cart->getValues(),
-		"products"=>$cart->getProducts()
+		'order'=>$order->getValues(),
+		'cart'=>$cart->getValues(),
+		'products'=>$cart->getProducts()
 	]);
 
 
